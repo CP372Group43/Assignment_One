@@ -1,5 +1,3 @@
-package Assignment_One;
-
 import java.io.* ;
 import java.net.* ;
 import java.util.* ;
@@ -12,7 +10,7 @@ public class WebServer implements Runnable{
 	public boolean isRunning = true;
 	
 	public static void main(String[] args) {
-		new WebServer(5555);
+		new WebServer(Integer.parseInt(args[0]));
 	}
 	
 //	
@@ -28,22 +26,21 @@ public class WebServer implements Runnable{
     	
     	System.out.print("Yoo");
     	
+	    this.currentThread = Thread.currentThread();
 		try {
 			this.serverSocket =  new ServerSocket(port);
 			
-		}	catch(IOException e) {
-			System.err.format("Could not listen on port : %d",port);
+			System.out.print(this.serverSocket.getLocalSocketAddress());
+			
+		}	catch(IOException e) {			
+			System.err.format(e.getMessage());
 			System.exit(1);
 		}
-		
 		while (isRunning) {
 			Socket clientSocket = null;
 			try {
 		        clientSocket = serverSocket.accept();
 		        new Thread(new CsapProtocol(clientSocket)).start();
-		        
-		        System.out.print("Yoooo");
-		        
 		    } catch (IOException e) {
 		        System.err.println("Accept failed.");
 		        System.exit(1);

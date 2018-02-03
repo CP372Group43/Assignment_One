@@ -1,4 +1,3 @@
-package Assignment_One;
 import java.lang.*;
 import java.util.*;
 public class Book {
@@ -37,10 +36,6 @@ public class Book {
 	}
 	public String getIsbn() {
 		return this.isbn;
-	}
-	public void updateIsbn(String isbn) {
-		//isbn validation here.
-		this.isbn=isbn;
 	}
 	
 }

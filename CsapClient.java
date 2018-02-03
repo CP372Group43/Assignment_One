@@ -1,4 +1,3 @@
-package Assignment_One;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -113,7 +112,8 @@ public class CsapClient extends JFrame implements ActionListener {
             socket = new Socket(host, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.write(body_text_area.getText());
+                        
+            out.write(body_text_area.getText().replace('\n', ','));
         } catch (UnknownHostException e) {
             System.err.println("The host could not be fouSnd: " + host);
             System.exit(1);
