@@ -24,7 +24,19 @@ public class CsapProtocol implements Runnable{
 		this.client=client;
 	}
 	public void run() {
-		
+		System.out.println("in");
+		try {
+			processRequest();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private void processRequest() throws Exception{
+		InputStream input = client.getInputStream();
+		OutputStream output = client.getOutputStream();
+		BufferedReader br = new BufferedReader(new InputStreamReader(input));
+		String requestLine = br.readLine();
+		System.out.println(requestLine);
 	}
 	
 	

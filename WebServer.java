@@ -1,3 +1,5 @@
+package Assignment_One;
+
 import java.io.* ;
 import java.net.* ;
 import java.util.* ;
@@ -26,7 +28,6 @@ public class WebServer implements Runnable{
     	
     	System.out.print("Yoo");
     	
-	    this.currentThread = Thread.currentThread();
 		try {
 			this.serverSocket =  new ServerSocket(port);
 			

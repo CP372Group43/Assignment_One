@@ -28,24 +28,11 @@ public class CsapClient extends JFrame implements ActionListener {
     public static JTextArea body_text_area;
     public static JTextArea response_text_area;
 
-    
+    StringReader read = null;
 	
 	public static void main(String[] args) {
 		CsapClient client = new CsapClient();
         client.setVisible(true);
-        try {
-        	Socket kkSocket = new Socket("173.33.5.46", 4444);
-        	PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-        	BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
-        } catch (UnknownHostException e) {
-            System.err.println("Don't know about host: taranis.");
-            System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to: taranis.");
-            System.exit(1);
-        }
-
-
 	}
 	
 	public CsapClient() {
@@ -108,7 +95,12 @@ public class CsapClient extends JFrame implements ActionListener {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		System.out.print(host_text_field.getText());
+		try {
+		connect(host_text_field.getText(),Integer.parseInt(port_text_field.getText()));
+		} catch(Exception a) {
+			a.printStackTrace();
+		}
+		read = new StringReader(body_text_area.getText());
     }
 	
 	public void connect(String host, int port) throws IOException {
@@ -121,18 +113,21 @@ public class CsapClient extends JFrame implements ActionListener {
             socket = new Socket(host, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out.write(body_text_area.getText());
         } catch (UnknownHostException e) {
-            System.err.println("The host could not be found: " + host);
+            System.err.println("The host could not be fouSnd: " + host);
             System.exit(1);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for connection to: " + host);
             System.exit(1);
         }
 
+       // BufferedReader stdIn = new BufferedReader(read);
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+
         String fromServer;
         String fromUser;
-
+        /**
         while ((fromServer = in.readLine()) != null) {
             System.out.println("Server: " + fromServer);
             if (fromServer.equals("Bye."))
@@ -144,6 +139,7 @@ public class CsapClient extends JFrame implements ActionListener {
 	                out.println(fromUser);
 		    }
         }
+        */
 
         out.close();
         in.close();
