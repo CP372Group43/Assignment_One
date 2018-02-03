@@ -1,3 +1,4 @@
+package Assignment_One;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,6 +33,19 @@ public class CsapClient extends JFrame implements ActionListener {
 	public static void main(String[] args) {
 		CsapClient client = new CsapClient();
         client.setVisible(true);
+        try {
+        	Socket kkSocket = new Socket("173.33.5.46", 4444);
+        	PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
+        	BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
+        } catch (UnknownHostException e) {
+            System.err.println("Don't know about host: taranis.");
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Couldn't get I/O for the connection to: taranis.");
+            System.exit(1);
+        }
+
+
 	}
 	
 	public CsapClient() {

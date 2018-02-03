@@ -1,29 +1,42 @@
+package Assignment_One;
 import java.io.* ;
 import java.net.* ;
 import java.util.* ;
 
-public final class WebServer {
-    public static void main(String argv[]) throws Exception {
-	// Get the port number from the command line.
-	int port = 5555;// new Integer(argv[0]).intValue();
-//	System.out.println(sss.charAt(0));
-	// Establish the listen socket.
-	ServerSocket socket = new ServerSocket(port);
+public class WebServer implements Runnable{
+	ArrayList <Book> bib = null;
+	private Thread currentThread = null;
+	final int port;
+	ServerSocket serverSocket = null;
+	public boolean isRunning = true;
+	public WebServer(int port) {
+		this.port=port;
+	}
+    public void run() {
+    	
+    this.currentThread = Thread.currentThread();
+	try {
+		this.serverSocket =  new ServerSocket(port);
+	}	catch(IOException e) {
+		System.err.format("Could not listen on port : %d",port);
+		System.exit(1);
+	}
 	
-	// Process HTTP service requests in an infinite loop.
-	while (true) {
-	    // Listen for a TCP connection request.
-	    Socket connection = socket.accept();
-	    
-	    // Construct an object to process the HTTP request message.
-	    HttpRequest request = new HttpRequest(connection);
-	    
-	    // Create a new thread to process the request.
-	    Thread thread = new Thread(request);
-	    
+	while (isRunning) {
+		Socket clientSocket = null;
+		try {
+	        clientSocket = serverSocket.accept();
+	        new Thread(new CsapProtocol(clientSocket)).start();;
+	    } catch (IOException e) {
+	        System.err.println("Accept failed.");
+	        System.exit(1);
+	    }
+		
 	    // Start the thread.
-	    thread.start();
 	}
     }
+ 
+    
+    
 }
 
