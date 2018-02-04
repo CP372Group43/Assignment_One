@@ -125,6 +125,9 @@ public class CsapClient extends JFrame implements ActionListener {
         DataOutputStream out = null;
         // connecting to the server
         try {
+        		
+    			connectToSocket(host_text_field.getText(),Integer.parseInt(port_text_field.getText()));
+        	
 	    		out= new DataOutputStream(clientSocket.getOutputStream());
 	    		in=new DataInputStream(clientSocket.getInputStream());
 	
@@ -146,8 +149,7 @@ public class CsapClient extends JFrame implements ActionListener {
         } catch (UnknownHostException e) {
         		response_text_area.setText("Request not sent. " + e.toString());
         } catch (IOException e) {
-        		response_text_area.setText("Request not sent. " + e.toString());
-
+            	response_text_area.setText("Request not sent. " + e.toString());
         } catch(Exception e) {
         		response_text_area.setText("Request not sent. " + e.toString());
         }
@@ -158,27 +160,8 @@ public class CsapClient extends JFrame implements ActionListener {
 	public void connect(String host, int port) throws IOException {
 		// connect to the server
 		if(clientSocket==null) {
-			// validate host and server
-			if(host_text_field.getText() == null) {
-				response_text_area.setText("Error. Please provide a host.");
-				return;
-			} else if(port_text_field.getText() == null) {
-				response_text_area.setText("Error. Please provide a port.");
-				return;
-			}
-			
-	        try {
-	            clientSocket = new Socket(host, port);
-	            connect_button.setText("Disconnect");
-    				response_text_area.setText("Connected to server.");
-    				// disable editing of host and port while connected
-    				host_text_field.setEditable(false);
-    				port_text_field.setEditable(false);
-	        } catch (UnknownHostException e) {
-	            response_text_area.setText("The host could not be found: " + host);
-	        } catch (IOException e) {
-	            response_text_area.setText("Couldn't get I/O for connection to: " + host);
-	        }
+			// connect to socket
+			connectToSocket(host, port);
 	    // disconnect from the server
 		}else if (clientSocket.isConnected()){
 			clientSocket.close();
@@ -189,6 +172,30 @@ public class CsapClient extends JFrame implements ActionListener {
 			host_text_field.setEditable(true);
 			port_text_field.setEditable(true);
 		}
+	}
+	
+	public void connectToSocket(String host, int port) throws IOException {
+		// validate host and server
+		if(host_text_field.getText() == null) {
+			response_text_area.setText("Error. Please provide a host.");
+			return;
+		} else if(port_text_field.getText() == null) {
+			response_text_area.setText("Error. Please provide a port.");
+			return;
+		}
+		
+        try {
+            clientSocket = new Socket(host, port);
+            connect_button.setText("Disconnect");
+				response_text_area.setText("Connected to server.");
+				// disable editing of host and port while connected
+				host_text_field.setEditable(false);
+				port_text_field.setEditable(false);
+        } catch (UnknownHostException e) {
+            response_text_area.setText("The host could not be found: " + host);
+        } catch (IOException e) {
+            response_text_area.setText("Couldn't get I/O for connection to: " + host);
+        }
 	}
 	
 	// validate the request body input
