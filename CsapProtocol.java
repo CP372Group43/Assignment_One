@@ -1,3 +1,4 @@
+package Assignment_One;
 import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,6 @@ public class CsapProtocol implements Runnable{
 	}
 	
 	public void run() {
-		System.out.println("in");
 		try {
 			processRequest();
 		}catch(Exception e) {
@@ -37,18 +37,21 @@ public class CsapProtocol implements Runnable{
 		}
 	}
 	private void processRequest() throws Exception{
-		InputStream input = client.getInputStream();
-		OutputStream output = client.getOutputStream();
-		BufferedReader br = new BufferedReader(new InputStreamReader(input));
-		String requestLine = br.readLine();
-		System.out.println(requestLine);
-		
+	//	InputStream input = client.getInputStream();
+		//OutputStream output = client.getOutputStream();
+	//	BufferedReader br = new BufferedReader(new InputStreamReader(input));
+	//	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(output));
+		DataInputStream input = new DataInputStream(client.getInputStream());
+		DataOutputStream output = new DataOutputStream(client.getOutputStream());
+		                 String instring;
+
+		@SuppressWarnings("deprecation")
+		String requestLine=input.readLine();
 		// Convert the request message into an array
 		String requestData[] = requestLine.split(",");
 		
-		System.out.println(requestData.length);
-		System.out.println(requestData[0]);
 
+		System.out.println(requestData.length);
 		System.out.println("------");
 		
 		// the request type
@@ -56,7 +59,7 @@ public class CsapProtocol implements Runnable{
 		
 		// Organize the request attributes into a nice data structure		
 		Map<String, String> attrMap = new HashMap<String, String>();		
-		
+		output.writeBytes("we are okay");
 		
 		for(int i = 1; i < requestData.length; i++) {
 			String dataLine[] = requestData[i].split(" ");
@@ -90,8 +93,9 @@ public class CsapProtocol implements Runnable{
 			}
 			Book newBook = new Book(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
 			BOOKS[0] = newBook;
-			
-			System.out.println("The book was added successfully");
+		//	bw.write("we are okay");
+	///		bw.flush();
+	//		
 		} else if(requestType == "UPDATE") {
 			
 		} else if(requestType == "GET") {
@@ -100,6 +104,8 @@ public class CsapProtocol implements Runnable{
 			
 		}
 		
+		input.close();
+		output.close();
 	}
 	
 	// returns a set of books from the BOOKS array

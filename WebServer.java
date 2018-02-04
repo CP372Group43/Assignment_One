@@ -1,3 +1,4 @@
+package Assignment_One;
 import java.io.* ;
 import java.net.* ;
 import java.util.* ;
@@ -24,8 +25,10 @@ public class WebServer implements Runnable{
 	
     public void run() {
     	
-    	System.out.print("Yoo");
-    	
+    	System.out.print("Server On \n");
+    	synchronized(this) {
+    	    this.currentThread = Thread.currentThread();
+    	}
 	    this.currentThread = Thread.currentThread();
 		try {
 			this.serverSocket =  new ServerSocket(port);
@@ -44,10 +47,12 @@ public class WebServer implements Runnable{
 		    } catch (IOException e) {
 		        System.err.println("Accept failed.");
 		        System.exit(1);
-		    }
-			
+		        isRunning=false;
+		    }			
 		    // Start the thread.
 		}
+		
+		
     }
  
     

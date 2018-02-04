@@ -1,3 +1,4 @@
+package Assignment_One;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -104,47 +105,38 @@ public class CsapClient extends JFrame implements ActionListener {
 	
 	public void connect(String host, int port) throws IOException {
 		Socket socket = null;
-        PrintWriter out = null;
-        BufferedReader in = null;
-
+        InputStream input = null;
+        DataInputStream in = null;
+DataOutputStream out = null;
         // connecting to the server
         try {
             socket = new Socket(host, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        
-            out.write(body_text_area.getText().replace('\n', ','));
+    		OutputStream output = socket.getOutputStream();
+//  		bw = new BufferedWriter(new OutputStreamWriter(output));
+    		out= new DataOutputStream(socket.getOutputStream());
+    		in=new DataInputStream(socket.getInputStream());
+
+    		String intxt = body_text_area.getText().replace('\n', ',');
+    		intxt+="\n";
+            out.writeBytes(intxt);
+            
+          //  input = socket.getInputStream();
+       //		br = new BufferedReader(new InputStreamReader(input));
+       			String inptxt = in.readLine();
+       		
+       		//System.out.println(br.readLine());
+       		response_text_area.setText(inptxt);
         } catch (UnknownHostException e) {
-            System.err.println("The host could not be fouSnd: " + host);
+            System.err.println("The host could not be found: " + host);
             System.exit(1);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for connection to: " + host);
             System.exit(1);
         }
-
-       // BufferedReader stdIn = new BufferedReader(read);
-        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-
-        String fromServer;
-        String fromUser;
-        /**
-        while ((fromServer = in.readLine()) != null) {
-            System.out.println("Server: " + fromServer);
-            if (fromServer.equals("Bye."))
-                break;
-		    
-            fromUser = stdIn.readLine();
-		    if (fromUser != null) {
-	                System.out.println("Client: " + fromUser);
-	                out.println(fromUser);
-		    }
-        }
-        */
-
-        out.close();
-        in.close();
-        stdIn.close();
+       // bw.close();
+      //  br.close();
         socket.close();
+
 	}
 	
 }
