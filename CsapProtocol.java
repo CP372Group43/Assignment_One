@@ -99,8 +99,6 @@ public class CsapProtocol implements Runnable{
 				System.out.println("Bib size: " + bib.size());
 				System.out.println("Found size: " + findBooks("Gerhard", null, null, 0, null).size());
 			}
-			
-			
 		} else if(requestType == "UPDATE") {
 			
 		} else if(requestType == "GET") {
