@@ -3,7 +3,7 @@ import java.lang.*;
 import java.util.*;
 public class Book {
 	private String author,title,publisher, isbn;
-	private int year;
+	private Integer year = new Integer(-1);
 	public Book(String author, String title, String publisher, int year, String isbn) {
 		this.author=author;
 		this.title=title;
@@ -37,6 +37,20 @@ public class Book {
 	}
 	public String getIsbn() {
 		return this.isbn;
+	}
+	public String getString() {
+		String book = "";
+		if(this.author!=null) {
+		book+=String.format("AUTHOR = {%s},\n", this.author);
+		}
+		if(this.title!=null) {
+			book+=String.format("TITLE = {%s},\n", this.title);
+		}
+		if(this.publisher!=null) {
+			book+=String.format("PUBLISHER = {%s},\n", this.publisher);
+		}
+		//book+=String.format("ISBN = {%d},\n", this.isbn);
+		return book;
 	}
 	
 }

@@ -105,27 +105,20 @@ public class CsapClient extends JFrame implements ActionListener {
 	
 	public void connect(String host, int port) throws IOException {
 		Socket socket = null;
-        InputStream input = null;
         DataInputStream in = null;
-DataOutputStream out = null;
+        DataOutputStream out = null;
         // connecting to the server
         try {
             socket = new Socket(host, port);
-    		OutputStream output = socket.getOutputStream();
-//  		bw = new BufferedWriter(new OutputStreamWriter(output));
     		out= new DataOutputStream(socket.getOutputStream());
     		in=new DataInputStream(socket.getInputStream());
 
     		String intxt = body_text_area.getText().replace('\n', ',');
     		intxt+="\n";
             out.writeBytes(intxt);
-            
-          //  input = socket.getInputStream();
-       //		br = new BufferedReader(new InputStreamReader(input));
-       			String inptxt = in.readLine();
+       		String inptxt = in.readLine();
        		
-       		//System.out.println(br.readLine());
-       		response_text_area.setText(inptxt);
+       	response_text_area.setText(inptxt);
         } catch (UnknownHostException e) {
             System.err.println("The host could not be found: " + host);
             System.exit(1);
@@ -133,8 +126,7 @@ DataOutputStream out = null;
             System.err.println("Couldn't get I/O for connection to: " + host);
             System.exit(1);
         }
-       // bw.close();
-      //  br.close();
+
         socket.close();
 
 	}

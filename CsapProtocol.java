@@ -1,3 +1,4 @@
+package Assignment_One;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,11 +23,12 @@ public class CsapProtocol implements Runnable{
     
 	private int state = WAITING;
 	
-	private static ArrayList <Book> bib = new ArrayList<Book>();
+	private static ArrayList <Book> bib = null;
 	
 	protected Socket client=null;
-	public CsapProtocol(Socket client) {
+	public CsapProtocol(Socket client, ArrayList<Book> bib) {
 		this.client=client;
+		this.bib = bib;
 	}
 	
 	public void run() {
@@ -119,6 +121,13 @@ public class CsapProtocol implements Runnable{
 			}
 			
 		} else if(requestType.equals("GET")) {
+			if(requestData[1]=="ALL") {
+				int i=0;
+				for(i=0;i<bib.size();i++) {
+					output.writeBytes(bib.get(i).getString());
+				}
+			}
+			
 			
 		} else if(requestType.equals("REMOVE")) {
 			// find books to remove
@@ -140,6 +149,8 @@ public class CsapProtocol implements Runnable{
 		
 		input.close();
 		output.close();
+		printBooks();
+		System.out.println("DONE\n");
 	}
 	
 	// returns a set of books from the BOOKS array
@@ -196,6 +207,13 @@ public class CsapProtocol implements Runnable{
 		}
 		
 		return removeCount;
+	}
+	public static void printBooks() {
+		int i=0;
+		for(i=0;i<bib.size();i++) {
+			System.out.println(bib.get(i).getString());
+		}
+			
 	}
 	
 }
