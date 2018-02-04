@@ -1,8 +1,8 @@
-package Assignment_One;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 
@@ -39,6 +39,8 @@ public class CsapClient extends JFrame implements ActionListener {
 		setTitle("CSAP Client");
 		setSize(WIDTH, HEIGHT);
     		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    		setResizable(false);
+    		
     		
     		JPanel server_panel = new JPanel(new FlowLayout());
         	JPanel message_panel = new JPanel();
@@ -54,10 +56,17 @@ public class CsapClient extends JFrame implements ActionListener {
     		
     		body_text_area = new JTextArea(10, 20);
     		body_text_area.setBackground(Color.WHITE);
+    		body_text_area.setLineWrap(true);
+    		body_text_area.setWrapStyleWord(true);
+        JScrollPane body_scroll_panel = new JScrollPane(body_text_area);
+
     		
     		response_text_area = new JTextArea(10, 20);
     		response_text_area.setEditable(false);
     		response_text_area.setBackground(Color.WHITE);
+    		response_text_area.setLineWrap(true);
+    		response_text_area.setWrapStyleWord(true);
+        JScrollPane response_scroll_panel = new JScrollPane(response_text_area);
     		
 //    		setLayout(new FlowLayout());
         
@@ -68,10 +77,10 @@ public class CsapClient extends JFrame implements ActionListener {
     		server_panel.add(port_text_field);
         
     		message_panel.add(new JLabel("Request Body: "));
-    		message_panel.add(body_text_area);
+    		message_panel.add(body_scroll_panel);
     		
     		response_panel.add(new JLabel("Response: "));
-    		response_panel.add(response_text_area);
+    		response_panel.add(response_scroll_panel);
     		
     		wrapper_panel.add(server_panel, BorderLayout.NORTH);
     		wrapper_panel.add(message_panel, BorderLayout.CENTER);
@@ -118,7 +127,7 @@ public class CsapClient extends JFrame implements ActionListener {
             out.writeBytes(intxt);
        		String inptxt = in.readLine();
        		
-       	response_text_area.setText(inptxt);
+       	response_text_area.setText(inptxt.replaceAll("-newline-", "\n"));
         } catch (UnknownHostException e) {
             System.err.println("The host could not be found: " + host);
             System.exit(1);
