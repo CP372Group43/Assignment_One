@@ -8,7 +8,6 @@ import javax.swing.JTextArea;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
@@ -27,6 +26,7 @@ public class CsapClient extends JFrame implements ActionListener {
     public static JTextField port_text_field;
     public static JTextArea body_text_area;
     public static JTextArea response_text_area;
+    public static JButton connect_button;
 
     StringReader read = null;
 	public Socket clientSocket = null;
@@ -36,30 +36,35 @@ public class CsapClient extends JFrame implements ActionListener {
 	}
 	
 	public CsapClient() {
+		// setting up the JFrame
 		setTitle("CSAP Client");
 		setSize(WIDTH, HEIGHT);
     		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     		setResizable(false);
 
-    		
+    		// init all our panels
     		JPanel server_panel = new JPanel(new FlowLayout());
         	JPanel message_panel = new JPanel();
         	JPanel response_panel = new JPanel();
         	JPanel wrapper_panel = new JPanel();
         	JPanel actions_panel = new JPanel();
     		
+        	// host field
     		host_text_field = new JTextField("", 10);
     		host_text_field.setBackground(Color.WHITE);
     		
+    		// port field
     		port_text_field = new JTextField("", 10);
     		port_text_field.setBackground(Color.WHITE);
     		
+    		// body text area
     		body_text_area = new JTextArea(10, 20);
     		body_text_area.setBackground(Color.WHITE);
     		body_text_area.setLineWrap(true);
     		body_text_area.setWrapStyleWord(true);
     		JScrollPane body_scroll_panel = new JScrollPane(body_text_area);
     		
+    		// response text area
     		response_text_area = new JTextArea(10, 20);
     		response_text_area.setEditable(false);
     		response_text_area.setBackground(Color.WHITE);
@@ -67,20 +72,15 @@ public class CsapClient extends JFrame implements ActionListener {
     		response_text_area.setWrapStyleWord(true);
     		JScrollPane response_scroll_panel = new JScrollPane(response_text_area);
     		
-//    		setLayout(new FlowLayout());
-        
+    		// adding labels and inputs to panels
     		server_panel.add(new JLabel("Host: "));
     		server_panel.add(host_text_field);
-        
     		server_panel.add(new JLabel("Port: "));
     		server_panel.add(port_text_field);
-        
     		message_panel.add(new JLabel("Request Body: "));
     		message_panel.add(body_scroll_panel);
-    		
     		response_panel.add(new JLabel("Response: "));
     		response_panel.add(response_scroll_panel);
-    		
     		wrapper_panel.add(server_panel, BorderLayout.NORTH);
     		wrapper_panel.add(message_panel, BorderLayout.CENTER);
     		
@@ -91,13 +91,12 @@ public class CsapClient extends JFrame implements ActionListener {
         actions_panel.add(send_button); 
         
         // add Connect/Disconnect Button
-        JButton connect_button = new JButton("Connect"); 
+        connect_button = new JButton("Connect"); 
         connect_button.setActionCommand("connect");
         connect_button.addActionListener(this);
         actions_panel.add(connect_button);
         
         wrapper_panel.add(actions_panel, BorderLayout.CENTER);
-        
         wrapper_panel.add(response_panel, BorderLayout.CENTER);
     		
     		add(wrapper_panel);
@@ -106,65 +105,101 @@ public class CsapClient extends JFrame implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 		if("connect".equals(e.getActionCommand())) {
-		try {
-		connect(host_text_field.getText(),Integer.parseInt(port_text_field.getText()));
-		} catch(Exception a) {
-			a.printStackTrace();
-		}
-		}else if("send".equals(e.getActionCommand()))
+			try {
+				connect(host_text_field.getText(),Integer.parseInt(port_text_field.getText()));
+			} catch(Exception a) {
+        			response_text_area.setText(a.toString());
+			}
+		}else if("send".equals(e.getActionCommand())) {
 			try {
 				send();
 			} catch(Exception a) {
-				a.printStackTrace();
+        			response_text_area.setText(a.toString());
 			}
 		}
+	}
+	
+	// send a CSAP message to the server
 	public void send() {
         DataInputStream in = null;
         DataOutputStream out = null;
         // connecting to the server
         try {
-    		out= new DataOutputStream(clientSocket.getOutputStream());
-    		in=new DataInputStream(clientSocket.getInputStream());
+	    		out= new DataOutputStream(clientSocket.getOutputStream());
+	    		in=new DataInputStream(clientSocket.getInputStream());
+	
+	    		// replace \n with , so the intxt is a valid format for sending to the server
+	    		String intxt = body_text_area.getText().replace('\n', ',');
+	    		intxt += "\n";
+	    		
+	    		// valide the request message
+	    		checkInput(intxt);
+	    		
+	    		// send the message to the server
+	    		out.writeBytes(intxt);
+	    		
+	    		// retrieve the response from the server
+	    		String inptxt = in.readLine();	
 
-    		String intxt = body_text_area.getText().replace('\n', ',');
-    		checkInput(intxt);
-    		intxt+="\n";
-    		
-            out.writeBytes(intxt);
-       		String inptxt = in.readLine();
-       		
-       	response_text_area.setText(inptxt.replaceAll("-newline-", "\n"));
+	    		// display the response in the response text area, and properly format the message
+	       	response_text_area.setText(inptxt.replaceAll("-newline-", "\n"));
         } catch (UnknownHostException e) {
-        	response_text_area.setText(e.toString());
+        		response_text_area.setText("Request not sent. " + e.toString());
         } catch (IOException e) {
-        	response_text_area.setText(e.toString());
+        		response_text_area.setText("Request not sent. " + e.toString());
+
         } catch(Exception e) {
-        	response_text_area.setText(e.toString());
+        		response_text_area.setText("Request not sent. " + e.toString());
         }
 
 	}
 	
+	// connect/disconnect to/from the server
 	public void connect(String host, int port) throws IOException {
+		// connect to the server
 		if(clientSocket==null) {
-        try {
-            clientSocket = new Socket(host, port);
-        } catch (UnknownHostException e) {
-            System.err.println("The host could not be found: " + host);
-            System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for connection to: " + host);
-            System.exit(1);
-        }
+			// validate host and server
+			if(host_text_field.getText() == null) {
+				response_text_area.setText("Error. Please provide a host.");
+				return;
+			} else if(port_text_field.getText() == null) {
+				response_text_area.setText("Error. Please provide a port.");
+				return;
+			}
+			
+	        try {
+	            clientSocket = new Socket(host, port);
+	            connect_button.setText("Disconnect");
+    				response_text_area.setText("Connected to server.");
+    				// disable editing of host and port while connected
+    				host_text_field.setEditable(false);
+    				port_text_field.setEditable(false);
+	        } catch (UnknownHostException e) {
+	            response_text_area.setText("The host could not be found: " + host);
+	        } catch (IOException e) {
+	            response_text_area.setText("Couldn't get I/O for connection to: " + host);
+	        }
+	    // disconnect from the server
 		}else if (clientSocket.isConnected()){
 			clientSocket.close();
+			clientSocket = null;
+			connect_button.setText("Connect");
+			response_text_area.setText("Disconnected from server.");
+			// enable editing of host and port while disconnected
+			host_text_field.setEditable(true);
+			port_text_field.setEditable(true);
 		}
 	}
+	
+	// validate the request body input
 	public void checkInput(String input) throws Exception{
 		String[] texts = input.split(",");
 		String i = "",isbn="";
 		
-		if((input.contains("SUBMIT")||input.contains("UPDATE")) && !input.contains("ISBN")) {
-				throw new Exception("no ISBN entered");
+		if(input == null || input.equals("")) {
+			throw new Exception("Request Not Sent. No request entered.");
+		} else if((input.contains("SUBMIT")||input.contains("UPDATE")) && !input.contains("ISBN")) {
+			throw new Exception("Request Not Sent. No ISBN entered.");
 		}else if(input.contains("SUBMIT")||input.contains("UPDATE")) {
 			int j=0;
 			for (j=0;j<texts.length;j++) {
@@ -173,7 +208,7 @@ public class CsapClient extends JFrame implements ActionListener {
 					try {
 					isbn=i.substring(5, i.length());
 					}catch(Exception e) {
-						throw new Exception("invalid ISBN entered");
+						throw new Exception("Request Not Sent. Invalid ISBN entered.");
 					}
 				}
 			}
@@ -182,7 +217,7 @@ public class CsapClient extends JFrame implements ActionListener {
 	        //must be a 13 digit ISBN
 	        if ( isbn.length() != 13 )
 	        {
-	            throw new Exception("invalid ISBN entered");
+	            throw new Exception("Request Not Sent. Invalid ISBN entered.");
 	        }
 			try
 	        {
@@ -201,13 +236,13 @@ public class CsapClient extends JFrame implements ActionListener {
 	            }
 	            
 	            if(!(checksum == Integer.parseInt( isbn.substring( 12 ) ))) {
-	            	throw new Exception("invalid ISBN entered");
+	            	throw new Exception("Request Not Sent. Invalid ISBN entered.");
 	            }
 	        }
 	        catch ( NumberFormatException nfe )
 	        {
 	            //to catch invalid ISBNs that have non-numeric characters in them
-	        	throw new Exception("invalid ISBN entered");
+	        	throw new Exception("Request Not Sent. Invalid ISBN entered.");
 	        }
 		}
 	}
