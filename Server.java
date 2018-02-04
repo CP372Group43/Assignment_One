@@ -1,8 +1,9 @@
+package Assignment_One;
 import java.io.* ;
 import java.net.* ;
 import java.util.* ;
 
-public class WebServer implements Runnable{
+public class Server implements Runnable{
 	static ArrayList <Book> bib = new ArrayList<Book>();
 	private Thread currentThread = null;
 	private int port;
@@ -10,11 +11,11 @@ public class WebServer implements Runnable{
 	public boolean isRunning = true;
 	
 	public static void main(String[] args) {
-		new WebServer(Integer.parseInt(args[0]));
+		new Server(Integer.parseInt(args[0]));
 	}
 	
 //	
-	public WebServer(int port) {
+	public Server(int port) {
 		this.port=port;
 		
 		this.run();
