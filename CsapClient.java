@@ -1,4 +1,3 @@
-package Assignment_One;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -134,7 +133,7 @@ public class CsapClient extends JFrame implements ActionListener {
             out.writeBytes(intxt);
        		String inptxt = in.readLine();
        		
-       	response_text_area.setText(inptxt);
+       	response_text_area.setText(inptxt.replaceAll("-newline-", "\n"));
         } catch (UnknownHostException e) {
         	response_text_area.setText(e.toString());
         } catch (IOException e) {
