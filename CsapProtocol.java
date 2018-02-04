@@ -59,7 +59,6 @@ public class CsapProtocol implements Runnable{
 		
 		// Organize the request attributes into a nice data structure		
 		Map<String, String> attrMap = new HashMap<String, String>();		
-		output.writeBytes("we are okay");
 		
 		for(int i = 1; i < requestData.length; i++) {
 			String dataLine[] = requestData[i].split(" ");
@@ -87,7 +86,7 @@ public class CsapProtocol implements Runnable{
 		if(requestType.equals("SUBMIT")) { // submit a new book
 			// first check if a book with that ISBN already exists
 			if(findBooks(null, null, null, 0, attrMap.get("ISBN")).size() > 0) {
-				System.out.println("A book with that ISBN already exists");
+				output.writeBytes("REDIRECTION 200. A book with that ISBN already exists.");
 			} else {
 				int bookYear = 0	;
 				if(attrMap.get("YEAR") != null) {
@@ -96,10 +95,34 @@ public class CsapProtocol implements Runnable{
 				Book newBook = new Book(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
 				bib.add(newBook);
 				
-				System.out.println("Bib size: " + bib.size());
-				System.out.println("Found size: " + findBooks("Gerhard", null, null, 0, null).size());
+				output.writeBytes("SUCCESS 100. The book was successfully added.");
 			}
-		} else if(requestType == "UPDATE") {
+		} else if(requestType.equals("UPDATE")) {
+			ArrayList<Book> foundBooks = findBooks(null, null, null, 0, attrMap.get("ISBN"));
+			
+			// if the book is not found
+			if(foundBooks.size() == 0) {
+				output.writeBytes("REDIRECTION 201. A book with that ISBN doesn't exist.");
+			} else {
+				// update the books attributes
+				if(attrMap.get("AUTHOR") != null) {
+					foundBooks.get(0).updateAuthor(attrMap.get("AUTHOR"));					
+				}
+				if(attrMap.get("TITLE") != null) {
+					foundBooks.get(0).updateTitle(attrMap.get("TITLE"));					
+				}
+				if(attrMap.get("PUBLISHER") != null) {
+					foundBooks.get(0).updatePublisher(attrMap.get("PUBLISHER"));					
+				}
+				if(attrMap.get("YEAR") != null) {
+					int bookYear = 0	;
+					if(attrMap.get("YEAR") != null) {
+						bookYear = Integer.parseInt(attrMap.get("YEAR"));
+					}
+					foundBooks.get(0).updateYear(bookYear);					
+				}
+				output.writeBytes("SUCCESS 100. The book was successfully updated.");
+			}
 			
 		} else if(requestType == "GET") {
 			
