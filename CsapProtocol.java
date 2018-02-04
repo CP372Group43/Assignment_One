@@ -1,5 +1,5 @@
-package Assignment_One;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.*;
@@ -22,7 +22,7 @@ public class CsapProtocol implements Runnable{
     
 	private int state = WAITING;
 	
-	private static Book[] BOOKS = new Book[1000];
+	private static ArrayList <Book> bib = new ArrayList<Book>();
 	
 	protected Socket client=null;
 	public CsapProtocol(Socket client) {
@@ -85,17 +85,22 @@ public class CsapProtocol implements Runnable{
 		System.out.println("Year: " + attrMap.get("YEAR"));
 		
 		if(requestType.equals("SUBMIT")) { // submit a new book
-			// TODO: first check if a book with that ISBN already exists
-			
-			int bookYear = 0	;
-			if(attrMap.get("YEAR") != null) {
-				bookYear = Integer.parseInt(attrMap.get("YEAR"));
+			// first check if a book with that ISBN already exists
+			if(findBooks(null, null, null, 0, attrMap.get("ISBN")).size() > 0) {
+				System.out.println("A book with that ISBN already exists");
+			} else {
+				int bookYear = 0	;
+				if(attrMap.get("YEAR") != null) {
+					bookYear = Integer.parseInt(attrMap.get("YEAR"));
+				}
+				Book newBook = new Book(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
+				bib.add(newBook);
+				
+				System.out.println("Bib size: " + bib.size());
+				System.out.println("Found size: " + findBooks("Gerhard", null, null, 0, null).size());
 			}
-			Book newBook = new Book(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
-			BOOKS[0] = newBook;
-		//	bw.write("we are okay");
-	///		bw.flush();
-	//		
+			
+			
 		} else if(requestType == "UPDATE") {
 			
 		} else if(requestType == "GET") {
@@ -109,8 +114,31 @@ public class CsapProtocol implements Runnable{
 	}
 	
 	// returns a set of books from the BOOKS array
-	private static void findBooks(String author, String title, String publisher, int year, String isbn) {
+	private static ArrayList<Book> findBooks(String author, String title, String publisher, int year, String isbn) {
+		ArrayList <Book> found = new ArrayList<Book>();
 		
+		// go through each book
+		for(int i = 0; i < bib.size(); i++) {
+			Book b = bib.get(i);
+			
+			// check if the book meets the filter requirments
+			if(author != null && !b.getAuthor().equals(author)) {
+				continue;
+			} else if(title != null && !b.getTitle().equals(title)) {
+				continue;
+			} else if(publisher != null && !b.getPublisher().equals(publisher)) {
+				continue;
+			} else if(year != 0 && b.getYear() != year) {
+				continue;
+			} else if(isbn != null && !b.getIsbn().equals(isbn)) {
+				continue;
+			}
+			
+			// if the book passed all the checks append it to our found list
+			found.add(b);
+		}
+		
+		return found;
 	}
 	
 }
