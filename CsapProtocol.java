@@ -37,10 +37,6 @@ public class CsapProtocol implements Runnable{
 		}
 	}
 	private void processRequest() throws Exception{
-	//	InputStream input = client.getInputStream();
-		//OutputStream output = client.getOutputStream();
-	//	BufferedReader br = new BufferedReader(new InputStreamReader(input));
-	//	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(output));
 		DataInputStream input = new DataInputStream(client.getInputStream());
 		DataOutputStream output = new DataOutputStream(client.getOutputStream());
 		                 String instring;
@@ -80,13 +76,11 @@ public class CsapProtocol implements Runnable{
 			// add the attr key and value to the array
 			attrMap.put(attrKey, attrVal);
 		}
-		
-		System.out.println("Year: " + attrMap.get("YEAR"));
-		
+				
 		if(requestType.equals("SUBMIT")) { // submit a new book
 			// first check if a book with that ISBN already exists
 			if(findBooks(null, null, null, 0, attrMap.get("ISBN")).size() > 0) {
-				output.writeBytes("REDIRECTION 200. A book with that ISBN already exists.");
+				output.writeBytes("REDIRECTION " + DATAEXISTS + ". A book with that ISBN already exists.");
 			} else {
 				int bookYear = 0	;
 				if(attrMap.get("YEAR") != null) {
@@ -95,14 +89,14 @@ public class CsapProtocol implements Runnable{
 				Book newBook = new Book(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
 				bib.add(newBook);
 				
-				output.writeBytes("SUCCESS 100. The book was successfully added.");
+				output.writeBytes("SUCCESS " + OK + ". The book was successfully added.");
 			}
 		} else if(requestType.equals("UPDATE")) {
 			ArrayList<Book> foundBooks = findBooks(null, null, null, 0, attrMap.get("ISBN"));
 			
 			// if the book is not found
 			if(foundBooks.size() == 0) {
-				output.writeBytes("REDIRECTION 201. A book with that ISBN doesn't exist.");
+				output.writeBytes("REDIRECTION " + DATANOTEXIST + ". A book with that ISBN doesn't exist.");
 			} else {
 				// update the books attributes
 				if(attrMap.get("AUTHOR") != null) {
@@ -121,7 +115,7 @@ public class CsapProtocol implements Runnable{
 					}
 					foundBooks.get(0).updateYear(bookYear);					
 				}
-				output.writeBytes("SUCCESS 100. The book was successfully updated.");
+				output.writeBytes("SUCCESS " + OK + ". The book was successfully updated.");
 			}
 			
 		} else if(requestType.equals("GET")) {
@@ -138,8 +132,10 @@ public class CsapProtocol implements Runnable{
 			if(removeCount == 0) {
 				output.writeBytes("REDIRECTION 201. No books could be found with the requested parameters.");
 			} else {
-				output.writeBytes("SUCCESS 100. " + removeCount + " book(s) removed successfully.");
+				output.writeBytes("SUCCESS " + OK + ". " + removeCount + " book(s) removed successfully.");
 			}
+		} else {
+			output.writeBytes("ERROR " + NOTFOUND + ". The requested method could not be found.");
 		}
 		
 		input.close();
