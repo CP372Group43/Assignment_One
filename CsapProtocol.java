@@ -124,10 +124,22 @@ public class CsapProtocol implements Runnable{
 				output.writeBytes("SUCCESS 100. The book was successfully updated.");
 			}
 			
-		} else if(requestType == "GET") {
+		} else if(requestType.equals("GET")) {
 			
-		} else if(requestType == "REMOVE") {
-			
+		} else if(requestType.equals("REMOVE")) {
+			// find books to remove
+			int bookYear = 0	;
+			if(attrMap.get("YEAR") != null) {
+				bookYear = Integer.parseInt(attrMap.get("YEAR"));
+			}
+			int removeCount = removeBooks(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
+
+			// if the book is not found
+			if(removeCount == 0) {
+				output.writeBytes("REDIRECTION 201. No books could be found with the requested parameters.");
+			} else {
+				output.writeBytes("SUCCESS 100. " + removeCount + " book(s) removed successfully.");
+			}
 		}
 		
 		input.close();
@@ -160,6 +172,34 @@ public class CsapProtocol implements Runnable{
 		}
 		
 		return found;
+	}
+	
+	// returns the number of books that were removed
+	private static int removeBooks(String author, String title, String publisher, int year, String isbn) {
+		int removeCount = 0;
+		// go through each book
+		for(int i = 0; i < bib.size(); i++) {
+			Book b = bib.get(i);
+			
+			// check if the book meets the filter requirments
+			if(author != null && !b.getAuthor().equals(author)) {
+				continue;
+			} else if(title != null && !b.getTitle().equals(title)) {
+				continue;
+			} else if(publisher != null && !b.getPublisher().equals(publisher)) {
+				continue;
+			} else if(year != 0 && b.getYear() != year) {
+				continue;
+			} else if(isbn != null && !b.getIsbn().equals(isbn)) {
+				continue;
+			}
+			
+			// if the book passed all the checks remove it
+			bib.remove(i);
+			removeCount++;
+		}
+		
+		return removeCount;
 	}
 	
 }
