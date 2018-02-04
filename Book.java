@@ -1,4 +1,3 @@
-package Assignment_One;
 import java.lang.*;
 import java.util.*;
 public class Book {
@@ -40,16 +39,19 @@ public class Book {
 	}
 	public String getString() {
 		String book = "";
+		book+=String.format("ISBN = {%s}-newline-", this.isbn);
 		if(this.author!=null) {
-		book+=String.format("AUTHOR = {%s},\n", this.author);
+		book+=String.format("AUTHOR = {%s}-newline-", this.author);
 		}
 		if(this.title!=null) {
-			book+=String.format("TITLE = {%s},\n", this.title);
+			book+=String.format("TITLE = {%s}-newline-", this.title);
 		}
 		if(this.publisher!=null) {
-			book+=String.format("PUBLISHER = {%s},\n", this.publisher);
+			book+=String.format("PUBLISHER = {%s}-newline-", this.publisher);
 		}
-		//book+=String.format("ISBN = {%d},\n", this.isbn);
+		if(this.year!=0) {
+			book+=String.format("YEAR = {%d}-newline-", this.year);
+		}
 		return book;
 	}
 	

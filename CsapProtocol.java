@@ -1,4 +1,3 @@
-package Assignment_One;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +81,7 @@ public class CsapProtocol implements Runnable{
 		if(requestType.equals("SUBMIT")) { // submit a new book
 			// first check if a book with that ISBN already exists
 			if(findBooks(null, null, null, 0, attrMap.get("ISBN")).size() > 0) {
-				output.writeBytes("REDIRECTION " + DATAEXISTS + ". A book with that ISBN already exists.");
+				output.writeBytes("REDIRECTION " + DATAEXISTS + ".-newline-A book with that ISBN already exists.");
 			} else {
 				int bookYear = 0	;
 				if(attrMap.get("YEAR") != null) {
@@ -91,14 +90,14 @@ public class CsapProtocol implements Runnable{
 				Book newBook = new Book(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
 				bib.add(newBook);
 				
-				output.writeBytes("SUCCESS " + OK + ". The book was successfully added.");
+				output.writeBytes("SUCCESS " + OK + ".-newline-The book was successfully added.");
 			}
 		} else if(requestType.equals("UPDATE")) {
 			ArrayList<Book> foundBooks = findBooks(null, null, null, 0, attrMap.get("ISBN"));
 			
 			// if the book is not found
 			if(foundBooks.size() == 0) {
-				output.writeBytes("REDIRECTION " + DATANOTEXIST + ". A book with that ISBN doesn't exist.");
+				output.writeBytes("REDIRECTION " + DATANOTEXIST + ".-newline-A book with that ISBN doesn't exist.");
 			} else {
 				// update the books attributes
 				if(attrMap.get("AUTHOR") != null) {
@@ -117,36 +116,38 @@ public class CsapProtocol implements Runnable{
 					}
 					foundBooks.get(0).updateYear(bookYear);					
 				}
-				output.writeBytes("SUCCESS " + OK + ". The book was successfully updated.");
+				output.writeBytes("SUCCESS " + OK + ".-newline-The book was successfully updated.");
 			}
 			
 		} else if(requestType.equals("GET")) {
-			if(requestData[1]=="ALL") {
-				int i=0;
-				for(i=0;i<bib.size();i++) {
-					output.writeBytes(bib.get(i).getString());
-				}
-			}else {
-				ArrayList<Book> foundBooks = findBooks(null, null, null, 0, attrMap.get("ISBN"));
-				if(attrMap.get("AUTHOR") != null) {
-					foundBooks.get(0).updateAuthor(attrMap.get("AUTHOR"));					
-				}
-				if(attrMap.get("TITLE") != null) {
-					foundBooks.get(0).updateTitle(attrMap.get("TITLE"));					
-				}
-				if(attrMap.get("PUBLISHER") != null) {
-					foundBooks.get(0).updatePublisher(attrMap.get("PUBLISHER"));					
-				}
-				if(attrMap.get("YEAR") != null) {
-					int bookYear = 0	;
-					if(attrMap.get("YEAR") != null) {
-						bookYear = Integer.parseInt(attrMap.get("YEAR"));
+			System.out.print(requestData[1]);
+			String bibString = "SUCCESS 100.-newline-";
+			if(requestData[1].equals("ALL")) {
+				// if there are no books found
+				if(bib.size() == 0) {
+					bibString += "No books found.";
+				} else {
+					for(int i=0;i<bib.size();i++) {
+						bibString += bib.get(i).getString() + "-newline-";
 					}
-					foundBooks.get(0).updateYear(bookYear);					
 				}
+				output.writeBytes(bibString);
+			} else {
+				int bookYear = 0	;
+				if(attrMap.get("YEAR") != null) {
+					bookYear = Integer.parseInt(attrMap.get("YEAR"));
+				}
+				ArrayList<Book> foundBooks = findBooks(attrMap.get("AUTHOR"), attrMap.get("TITLE"), attrMap.get("PUBLISHER"), bookYear, attrMap.get("ISBN"));
+				// if there are no books found
+				if(foundBooks.size() == 0) {
+					bibString += "No books found.";
+				} else {
+					for(int i=0;i<foundBooks.size();i++) {
+						bibString += foundBooks.get(i).getString() + "-newline-";
+					}
+				}
+				output.writeBytes(bibString);
 			}
-			
-			
 		} else if(requestType.equals("REMOVE")) {
 			// find books to remove
 			int bookYear = 0	;
@@ -157,12 +158,12 @@ public class CsapProtocol implements Runnable{
 
 			// if the book is not found
 			if(removeCount == 0) {
-				output.writeBytes("REDIRECTION 201. No books could be found with the requested parameters.");
+				output.writeBytes("REDIRECTION " + DATANOTEXIST + ".-newline-No books could be found with the requested parameters.");
 			} else {
-				output.writeBytes("SUCCESS " + OK + ". " + removeCount + " book(s) removed successfully.");
+				output.writeBytes("SUCCESS " + OK + ".-newline-" + removeCount + " book(s) removed successfully.");
 			}
 		} else {
-			output.writeBytes("ERROR " + NOTFOUND + ". The requested method could not be found.");
+			output.writeBytes("ERROR " + NOTFOUND + ".-newline-The requested method could not be found.");
 		}
 		
 		input.close();
@@ -233,11 +234,13 @@ public class CsapProtocol implements Runnable{
 		}
 			
 	}
-	public boolean isbnCmp(String isbn, String clientIsbn) {
-		boolean isEqual = false;
-		if(isbn.equals(clientIsbn)) {
-			isEqual=true;
-		}
-		return isEqual;
-	}
+	
+		public boolean isbnCmp(String isbn, String clientIsbn) {
+	 		boolean isEqual = false;
+	 		if(isbn.equals(clientIsbn)) {
+	 			isEqual=true;
+	 		}
+	 		return isEqual;
+	 	}
+	
 }
