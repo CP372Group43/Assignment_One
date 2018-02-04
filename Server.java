@@ -5,7 +5,6 @@ import java.util.* ;
 
 public class Server implements Runnable{
 	static ArrayList <Book> bib = new ArrayList<Book>();
-	private Thread currentThread = null;
 	private int port;
 	ServerSocket serverSocket = null;
 	public boolean isRunning = true;
@@ -26,10 +25,6 @@ public class Server implements Runnable{
     public void run() {
     	
     	System.out.print("Server On \n");
-    	synchronized(this) {
-    	    this.currentThread = Thread.currentThread();
-    	}
-	    this.currentThread = Thread.currentThread();
 		try {
 			this.serverSocket =  new ServerSocket(port);
 			System.out.print(this.serverSocket.getLocalSocketAddress());
@@ -45,14 +40,14 @@ public class Server implements Runnable{
 		        new Thread(new CsapProtocol(clientSocket,bib)).start();
 		    } catch (IOException e) {
 		        System.err.println("Accept failed.");
-		        System.exit(1);
 		        isRunning=false;
+		        System.exit(1);
 		    }			
 		    // Start the thread.
 		}
 		
 		
-    }
+   }
  
     
     

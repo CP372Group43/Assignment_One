@@ -1,3 +1,4 @@
+package Assignment_One;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -125,9 +126,9 @@ public class CsapClient extends JFrame implements ActionListener {
         DataOutputStream out = null;
         // connecting to the server
         try {
-        		
+        		if(clientSocket!=null) {
     			connectToSocket(host_text_field.getText(),Integer.parseInt(port_text_field.getText()));
-        	
+        		}
 	    		out= new DataOutputStream(clientSocket.getOutputStream());
 	    		in=new DataInputStream(clientSocket.getInputStream());
 	
@@ -147,11 +148,11 @@ public class CsapClient extends JFrame implements ActionListener {
 	    		// display the response in the response text area, and properly format the message
 	       	response_text_area.setText(inptxt.replaceAll("-newline-", "\n"));
         } catch (UnknownHostException e) {
-        		response_text_area.setText("Request not sent. " + e.toString());
+        		response_text_area.setText("Request not sent. Not connected ");
         } catch (IOException e) {
-            	response_text_area.setText("Request not sent. " + e.toString());
+            	response_text_area.setText(e.getMessage());
         } catch(Exception e) {
-        		response_text_area.setText("Request not sent. " + e.toString());
+        		response_text_area.setText(e.getMessage());
         }
 
 	}
@@ -219,30 +220,30 @@ public class CsapClient extends JFrame implements ActionListener {
 					}
 				}
 			}
-			isbn.replaceAll( "-", "" );
+			 if ( isbn.length() != 13 )
+		        {
+		            throw new Exception("Request Not Sent. Invalid ISBN entered.");
+		        }
 
 	        //must be a 13 digit ISBN
-	        if ( isbn.length() != 13 )
-	        {
-	            throw new Exception("Request Not Sent. Invalid ISBN entered.");
-	        }
+	       
 			try
 	        {
-	            int tot = 0;
+	            int total = 0;
 	            for ( int y = 0; y < 12; y++ )
 	            {
 	                int digit = Integer.parseInt( isbn.substring( y, y + 1 ) );
-	                tot += (y % 2 == 0) ? digit * 1 : digit * 3;
+	                total += (y % 2 == 0) ? digit * 1 : digit * 3;
 	            }
 
 	            //checksum must be 0-9. If calculated as 10 then = 0
-	            int checksum = 10 - (tot % 10);
-	            if ( checksum == 10 )
+	            int checktotal = 10 - (total % 10);
+	            if ( checktotal == 10 )
 	            {
-	                checksum = 0;
+	                checktotal = 0;
 	            }
 	            
-	            if(!(checksum == Integer.parseInt( isbn.substring( 12 ) ))) {
+	            if(!(checktotal == Integer.parseInt( isbn.substring( 12 ) ))) {
 	            	throw new Exception("Request Not Sent. Invalid ISBN entered.");
 	            }
 	        }

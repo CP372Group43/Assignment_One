@@ -1,3 +1,4 @@
+package Assignment_One;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,34 +35,23 @@ public class CsapProtocol implements Runnable{
 		try {
 			processRequest();
 		}catch(Exception e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 	private void processRequest() throws Exception{
 		DataInputStream input = new DataInputStream(client.getInputStream());
 		DataOutputStream output = new DataOutputStream(client.getOutputStream());
-		                 String instring;
-
 		@SuppressWarnings("deprecation")
 		String requestLine=input.readLine();
 		// Convert the request message into an array
 		String requestData[] = requestLine.split(",");
-		
-
-		System.out.println(requestData.length);
-		System.out.println("------");
-		
 		// the request type
 		String requestType = requestData[0];
-		
 		// Organize the request attributes into a nice data structure		
 		Map<String, String> attrMap = new HashMap<String, String>();		
 		
 		for(int i = 1; i < requestData.length; i++) {
-			String dataLine[] = requestData[i].split(" ");
-			
-			System.out.println(requestData[i]);
-			
+			String dataLine[] = requestData[i].split(" ");			
 			// get the key from the first part of the line 
 			String attrKey = dataLine[0];
 			
@@ -120,7 +110,6 @@ public class CsapProtocol implements Runnable{
 			}
 			
 		} else if(requestType.equals("GET")) {
-			System.out.print(requestData[1]);
 			String bibString = "SUCCESS 100.-newline-";
 			if(requestData[1].equals("ALL")) {
 				// if there are no books found
@@ -168,8 +157,6 @@ public class CsapProtocol implements Runnable{
 		
 		input.close();
 		output.close();
-		printBooks();
-		System.out.println("DONE\n");
 	}
 	
 	// returns a set of books from the BOOKS array
@@ -227,15 +214,7 @@ public class CsapProtocol implements Runnable{
 		
 		return removeCount;
 	}
-	public static void printBooks() {
-		int i=0;
-		for(i=0;i<bib.size();i++) {
-			System.out.println(bib.get(i).getString());
-		}
-			
-	}
-	
-		public boolean isbnCmp(String isbn, String clientIsbn) {
+			public boolean isbnCmp(String isbn, String clientIsbn) {
 	 		boolean isEqual = false;
 	 		if(isbn.equals(clientIsbn)) {
 	 			isEqual=true;
